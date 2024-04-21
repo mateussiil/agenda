@@ -1,0 +1,12 @@
+{
+  "moduleFileExtensions": ["js", "json", "ts"],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".test.ts$",
+  "transform": {
+    "^.+\\.ts?$": "ts-jest"
+  },
+  "modulePaths": ["node_modules", "models", "src"],
+  "globals": {},
+  "modulePathIgnorePatterns": [".*__mocks__.*"]
+}
