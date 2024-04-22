@@ -3,6 +3,7 @@ import { Job } from "./job";
 export class AgendaManager {
   jobs: Job[] = []
   clock = new Date()
+  changedClock = false
 
   constructor() {
     this.jobs = []
@@ -12,19 +13,17 @@ export class AgendaManager {
     const job = new Job(time, fn)
 
     this.jobs.push(job)
+
+    return job
   }
 
   private checkJobs() {
     const now = new Date()
-    this.clock = now
 
+    if (!this.changedClock) this.clock = now
 
     for (let job of this.jobs) {
-      if (this.clock > job.nextRunAt && job.process !== "executed") {
-
-        console.log(this.clock)
-        console.log(job)
-
+      if (this.clock > job.nextRunAt && job.process === "waiting") {
         job.execute()
       }
     }
@@ -34,7 +33,12 @@ export class AgendaManager {
     setInterval(this.checkJobs.bind(this), 500)
   }
 
+  /**
+   * This should be used only in test
+   * @param {number}  milliseconds
+   */
   advanceTime(milliseconds: number){
+    this.changedClock = true
     this.clock.setTime(this.clock.getTime() + milliseconds)
   }
 }

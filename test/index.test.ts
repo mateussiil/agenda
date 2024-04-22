@@ -1,26 +1,22 @@
 // Importar a classe Agenda
 import { Agenda } from '../index';
-
-global.console.log = jest.fn();
-
-function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+import { delay } from '../utils/functions';
 
 describe('', () => {
   it('Verificar execução de tarefa agendada', async () => {
-    // Criar uma nova agenda
     const agenda = new Agenda();
+
+    const test = jest.fn();
 
     agenda.start();
 
     agenda.create(new Date(), () => {
-      console.log('Tarefa agendada executada!');
+      test('Tarefa agendada executada!')
     });
 
     await delay(500)
 
-    expect(console.log).toHaveBeenCalledWith('Tarefa agendada executada!');
+    expect(test).toHaveBeenCalledWith('Tarefa agendada executada!');
   });
 
   it('Verificar adição de tarefa', () => {
@@ -47,16 +43,55 @@ describe('', () => {
 
     agenda.start();
 
-    agenda.create(new Date(), () => {
-      console.log('Tarefa agendada executada 2!');
-    });
+    const test = jest.fn();
 
     const oneDay = 1000 * 60 * 60 * 24;
 
-    agenda.advanceTime(oneDay);
+    agenda.create(new Date(new Date().getTime() + oneDay), () => {
+      test('Tarefa agendada executada!');
+    });
+
+    agenda.advanceTime(oneDay + 1000);
 
     await delay(500)
     
-    expect(console.log).toHaveBeenCalledWith('Tarefa agendada executada 2!');
+    expect(test).toHaveBeenCalledWith('Tarefa agendada executada!');
   });
+
+  it('Verificar cancel', async () => {
+    const agenda = new Agenda();
+
+    agenda.start();
+
+    const test = jest.fn();
+
+    const job = agenda.create(new Date(), () => {
+      test('Tarefa agendada executada!');
+    });
+
+    job.cancel()
+
+    await delay(500)
+
+    expect(test).not.toHaveBeenCalledWith('Tarefa agendada executada!');
+  })
+
+  it('Verificar running', async () => {
+    const agenda = new Agenda();
+
+    agenda.start();
+
+    const test = jest.fn();
+
+    const job = agenda.create(new Date(), async () => {
+      test('Tarefa executando!');
+
+      await delay(1500)
+    });
+
+    await delay(500)
+
+    expect(job.process).toBe('running')
+    expect(test).toHaveBeenCalledWith('Tarefa executando!');
+  })
 });

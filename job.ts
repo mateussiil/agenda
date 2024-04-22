@@ -1,8 +1,8 @@
 export class Job {
-  nextRunAt: Date
+  readonly nextRunAt: Date
   fn: Function
-  id: number
-  process: 'waiting' | 'executed' | 'running' = 'waiting'
+  readonly id: number
+  process: 'waiting' | 'executed' | 'running' | 'canceled' = 'waiting'
 
   constructor(nextRunAt: Date, fn: Function) {
     this.nextRunAt = nextRunAt
@@ -10,8 +10,13 @@ export class Job {
     this.id = Math.round(Math.random() * 1000)
   }
 
-  execute() {
-    this.fn()
+  async execute() {
+    this.process = 'running'
+    await this.fn()
     this.process = 'executed'
+  }
+
+  cancel() {
+    this.process = 'canceled'
   }
 }
