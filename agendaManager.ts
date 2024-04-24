@@ -1,18 +1,20 @@
 import { Job } from "./job";
 
 export class AgendaManager {
-  jobs: Job[] = []
+  scheduleJobs: Job[] = []
   clock = new Date()
   changedClock = false
 
   constructor() {
-    this.jobs = []
+    this.scheduleJobs = []
   }
 
   create(time: Date, fn: Function) {
     const job = new Job(time, fn)
 
-    this.jobs.push(job)
+    this.scheduleJobs.push(job)
+
+    this.scheduleJobs = this.scheduleJobs.sort((a, b) => a.nextRunAt.getTime() - b.nextRunAt.getTime())
 
     return job
   }
@@ -22,7 +24,7 @@ export class AgendaManager {
 
     if (!this.changedClock) this.clock = now
 
-    for (let job of this.jobs) {
+    for (let job of this.scheduleJobs) {
       if (this.clock > job.nextRunAt && job.process === "waiting") {
         job.execute()
       }
